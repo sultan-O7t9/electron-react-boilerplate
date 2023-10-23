@@ -25,12 +25,6 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
-
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
@@ -93,6 +87,10 @@ const createWindow = async () => {
       mainWindow.show();
     }
   });
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -101,16 +99,32 @@ const createWindow = async () => {
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
 
-  // Open urls in the user's browser
-  mainWindow.webContents.setWindowOpenHandler((edata) => {
-    shell.openExternal(edata.url);
-    return { action: 'deny' };
-  });
-
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
 };
+
+let newWindow;
+
+function createNewWindow(url: string) {
+  newWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    title: 'Generated Report',
+    webPreferences: {
+      nodeIntegration: true,
+    },
+  });
+
+  newWindow.loadURL(url);
+
+  newWindow.on('closed', () => {
+    newWindow = null;
+  });
+}
+ipcMain.on('show-generated-pdf', async (event, arg) => {
+  createNewWindow(arg);
+});
 
 /**
  * Add event listeners...

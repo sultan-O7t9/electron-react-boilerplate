@@ -3,7 +3,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 const { jsPDF } = require('jspdf');
 
-export type Channels = 'ipc-example';
+export type Channels = 'show-generated-pdf';
 
 const electronHandler = {
   ipcRenderer: {

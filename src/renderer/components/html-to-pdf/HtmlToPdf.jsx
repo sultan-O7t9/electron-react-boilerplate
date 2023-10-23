@@ -1,408 +1,228 @@
-import printJS from 'print-js';
-// import { jsPDF } from 'jspdf';
 import jsPDF from 'jspdf';
 import { useRef, useState } from 'react';
 import './styles.css';
 import { Button } from 'antd';
-
+import html2pdf from 'html2pdf.js';
+const { ipcRenderer } = window.electron;
 const HtmlToPdf = () => {
+  const docHeight = 1038;
+  const footerHeight = 21;
+  const docWidth = 709;
   const tablesContainerRef = useRef(null);
-  const tablesRef = useRef([]);
-  const [docWidth, setDocWidth] = useState(300);
+  const [docPages, setDocPages] = useState(1);
+  const [link, setLink] = useState('');
 
   const handlePrint = () => {
     window.scrollTo(0, 0);
     var doc = new jsPDF('p', 'pt', 'a4');
-    let paperHeight = doc.internal.pageSize.height - 24;
+    let paperHeight = docHeight;
+    let orgPaperHeight = docHeight;
     console.log(paperHeight);
-
-    setDocWidth(doc.internal.pageSize.width - 24);
+    console.log(
+      doc.internal.pageSize,
+      'SIZE',
+      doc.internal.pageSize.getWidth(),
+      doc.internal.pageSize.getHeight(),
+    );
     const tables = tablesContainerRef.current.querySelectorAll('.table');
 
-    // let paperHeight = doc.internal.pageSize.height - 24;
-
     let prevTableHeight = 0;
-    for (let i = 0; i < tables; i++) {
+    let pages = 1;
+    for (let i = 0; i < tables.length; i++) {
       const table = tables[i];
 
       const tablePosition = table.getBoundingClientRect();
-      //   const tableHeight = tablePosition.bottom - prevTableHeight;
-      const tableHeight = tablePosition.bottom;
       const tableStart = tablePosition.top;
+      let tableHeight = tablePosition.bottom / pages;
       const multipleOf3 = i % 3 === 0 && i !== 0 && i !== tables.length - 1;
-      // if (multipleOf3 || tableHeight > paperHeight) {
+
       if (tableHeight > paperHeight) {
         let margin;
 
-        // if (multipleOf3 && tableHeight > paperHeight) {
-        //   margin = parseInt(
-        //     (
-        //       (paperHeight > tableHeight
-        //         ? paperHeight - tableHeight
-        //         : tableHeight - paperHeight) + 32
-        //     ).toFixed(2),
-        //   );
-        //   // console.log({ margin, paperHeight, tableStart });
-        // } else
+        let tbl = tables[i];
+        console.log(tableHeight, paperHeight, 'PEP');
 
         tbl.className = tbl.className + ' page-break';
-        console.log(tbl.id, tbl.className);
-        if (tableHeight > paperHeight) {
-          // margin = parseInt(
-          //   (
-          //     tableHeight -
-          //     paperHeight +
-          //     table.getBoundingClientRect().height +
-          //     32
-          //   ).toFixed(2),
-          // );
-        }
-        //   console.log('adADJ', {
-        //     margin,
-        //     table: table.id,
-        //     tableHeight,
-        //     paperHeight,
-        //     tbl: table.getBoundingClientRect().height,
-        //   });
-        // console.log({ margin });
-        //   tablesRef.current[i].setAttribute(
-        //     'style',
-        //     `width: 100%; border-collapse: collapse; margin: 0 0 4rem; padding-top:100px;`,
-        //   );
-        // const tbl = tablesRef.current[i];
-        //   tbl.innerHTML =
-        //     `<div style='height:${margin}px;width:20px;'></div>` + tbl.innerHTML;
-        // console.log(i);
-        // console.log(tablesRef.current[i]);
+        pages += 1;
+        prevTableHeight = tableHeight;
 
-        paperHeight += paperHeight;
-        //   prevTableHeight = Number(tableHeight) + Number(margin);
+        console.log(tbl.id, tbl.className);
+        console.log('PAGE BREAK ADDED');
       }
       console.log({
         table: table.id,
         paperHeight,
         tableHeight,
+        margin: tableHeight - paperHeight,
       });
     }
-    doc.html(tablesContainerRef.current, {
-      callback: function (doc) {
-        doc.setFontSize(14);
-        // console.log(doc.getNumberOfPages());
-        const totalPages = doc.getNumberOfPages();
-        for (let i = 1; i <= totalPages; i++) {
-          doc.setPage(i);
-          doc.text(
-            'LAB TECH _____________________',
-            doc.internal.pageSize.width - 250,
-            doc.internal.pageSize.height - 20,
-          );
-          // console.log('SET FOR', i);
-        }
 
-        doc.save();
-      },
-      x: 0,
-      y: 0,
-      autoPaging: true,
-    });
-    // doc.save('demo2.pdf');
+    var opt = {
+      margin: 32,
+      pagebreak: { avoid: 'table' },
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, logging: true, dpi: 300, letterRendering: true },
+      jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+    };
+    console.log(
+      Math.ceil(
+        tables[tables.length - 1].getBoundingClientRect().bottom / paperHeight,
+      ),
+      'TOTAL_PAGES',
+    );
+    pages = Math.ceil(
+      tables[tables.length - 1].getBoundingClientRect().bottom / paperHeight,
+    );
+    setDocPages(pages);
+    html2pdf()
+      .set(opt)
+      .from(document.getElementById('tables'))
+      .toPdf()
+      .get('pdf')
+      .then((pdf) => {
+        const l = pdf.output('bloburl');
+        window.electron.ipcRenderer.sendMessage('show-generated-pdf', l);
+      });
   };
   return (
     <>
-      <div className="">
+      <Button type="primary" id="print-button" onClick={handlePrint}>
+        Print
+      </Button>
+      <div className="hide">
         <div
           ref={tablesContainerRef}
           id="tables"
-          STYLE=" 
-          padding: 2rem 0;
-          font-family: 
-            sans-serif;
-        "
-          style={{ width: docWidth + 'px' }}
+          style={{
+            width: docWidth + 'px',
+            height: (docHeight - footerHeight) * docPages + 'px',
+            padding: '32px 0',
+            fontFamily: 'sans-serif',
+            position: 'relative',
+          }}
         >
-          {/* <div
-            STYLE="
-            position: absolute;
-            bottom: 0;
-            height: 100%;
-            background-color:transparent;
-            right: 0;
-            display: flex;
-            align-items: flex-end;
-          "
-          >
-            <div STYLE="display: flex; justify-content: end; align-items: flex-end">
-              <b STYLE="margin: 0 0.2rem 0 0;">LAB TECH.</b>
-              <div STYLE="border-bottom: 1px solid black;">
-                <p STYLE="margin: 0; opacity: 0">
-                  ********************************
-                </p>
+          {new Array(docPages).fill(1).map((el, i) => {
+            return (
+              <div
+                id="tech-sign"
+                key={i}
+                style={{
+                  position: 'absolute',
+                  top: (i + 1) * docHeight - footerHeight,
+                  right: 0,
+                }}
+              >
+                LAB TECH________________________
               </div>
-            </div>
-          </div> */}
+            );
+          })}
           <h1
-            STYLE="
-            text-transform: uppercase;text-decoration: underline;
-            font-weight: bold;text-align: center;margin: 0 0 0.2rem 0;font-family:  serif;
-          "
-            className="page-break"
+            style={{
+              textTransform: 'uppercase',
+              textDecoration: 'underline',
+              fontWeight: 'bold',
+              textAlign: 'center',
+              margin: ' 0 0 8px',
+              fontFamily: 'serif',
+            }}
           >
-            Shamim Arshad Clinic
+            SClinic
           </h1>
-          <p
-            STYLE="
-            text-transform: uppercase;
-            text-align: center;
-            font-weight: bold;
-            font-family: 
-              sans-serif;
-            margin: 0;
-          "
+          <div
+            style={{
+              textTransform: 'uppercase',
+              textAlign: 'center',
+              fontFamily: 'sans-serif',
+            }}
           >
-            not valid for any court
-          </p>
-          <p
-            STYLE="
-            text-transform: uppercase;
-            text-align: center;
-            font-family: 
-              sans-serif;
-            margin: 0;
-          "
-          >
-            Opposite Fauji Tower Eid Gaah Chowk, <b>Kunjah</b>
-          </p>
-          <p
-            STYLE="
-              page-break-before: always;
-            text-transform: uppercase;
-            text-align: center;
-            font-family: 
-              sans-serif;
-            margin: 0 0 2.5rem 0;
-          "
-          >
-            cell number --- <b>0349 4695920</b>
-          </p>
-          {/* <div className="report-info">
-            <div className="patient-info">
-              <div>
-                <p STYLE="min-width:9rem;">PATIENT NAME</p>
-                CHAUDHRY RANA FAIZAN CHAUDHRY RANA FAIZAN
-              </div>
-              <div className="gaurdian-info">
-                <p STYLE="min-width:9rem;">FATHER / HUSBAND</p>
-                CHAUDHRY RANA
-              </div>
-              <div className="age-info">
-                <p STYLE="min-width:5rem;">AGE / SEX</p>8 / MALE
-              </div>
-            </div>
-          </div> */}
-          <table STYLE="width: 100%; margin: 0 0 4rem;">
+            <b>not valid for any court</b>
+            <p>
+              Opposite Fauji Tower Eid Gaah Chowk, <b>Kunjah</b>
+            </p>
+            <p style={{ marginBottom: '48px' }}>
+              cell number --- <b>0349 4695920</b>
+            </p>
+          </div>
+
+          <table style={{ width: '100%', margin: '0 auto 64px' }}>
             <tbody>
-              <tr STYLE="min-height: 1.25rem; display: flex; font-size: 12px;width:100%">
-                <td
-                  STYLE="
-                  min-width: 50%;
-                  flex: 1;
-                  display: flex;
-                  align-items: center;
-                "
-                >
-                  <p STYLE="min-width: 8rem" className="font-12 margin-0">
+              <tr className="info-row">
+                <td className="info">
+                  <p style={{ minWidth: '128px' }}>
                     REPORT <span>#</span>
                   </p>
-                  <p className="font-12 margin-0">8975984092</p>
+                  <p>8975984092</p>
                 </td>
-                <td
-                  STYLE="
-                flex: 1;
-                min-width: 50%;
-                font-size: 12px;
-                display: flex;
-                align-items: center;
-              "
-                >
-                  <p STYLE="min-width: 60%;" className="font-12 margin-0">
-                    REGISTRATION DATE
-                  </p>
-                  <p STYLE="min-width:40%" className="font-12 margin-0">
-                    20-10-2023
-                  </p>
+                <td className="info">
+                  <p style={{ minWidth: '160px' }}>REGISTRATION DATE</p>
+                  <p>20-10-2023</p>
                 </td>
               </tr>
-              <tr STYLE="min-height:1.25rem; display: flex; font-size: 12px">
-                <td
-                  STYLE="
-                min-width: 50%;
-                flex: 1;
-                display: flex;
-                align-items: center;
-              "
-                >
-                  <p STYLE="min-width: 8rem" className="font-12 margin-0">
-                    PATIENT NAME
-                  </p>
-                  <b STYLE="font-size: 14px" className="font-12 margin-0">
-                    CHAUDHRY RANA FAIZAN BHUTTA
-                  </b>
+              <tr className="info-row">
+                <td className="info">
+                  <p style={{ minWidth: '128px' }}>PATIENT NAME</p>
+                  <b>CHAUDHRY RANA FAIZAN BHUTTA</b>
                 </td>
-                <td
-                  STYLE="
-                flex: 1;
-                font-size: 12px;
-                min-width: 50%;
-                display: flex;
-                align-items: center;
-              "
-                >
-                  <p STYLE="margin: 0; min-width: 60%;">
-                    REPORT COLLECTION DATE
-                  </p>
-                  <p STYLE="margin: ;min-width:40%">20-10-2023</p>
+                <td className="info">
+                  <p style={{ minWidth: '160px' }}>REPORT COLLECTION DATE</p>
+                  <p>20-10-2023</p>
                 </td>
               </tr>
-              <tr STYLE="min-height: 1.25rem; display: flex; font-size: 12px">
-                <td
-                  STYLE="
-                min-width: 50%;
-                flex: 1;
-                display: flex;
-                align-items: center;
-              "
-                >
-                  <p STYLE="margin: 0; min-width: 8rem">FATHER / HUSBAND</p>
-                  <b STYLE="margin: 0; font-size: 14px">CHOUDHRY'S FATHER</b>
+              <tr className="info-row">
+                <td className="info">
+                  <p style={{ minWidth: '128px' }}>FATHER / HUSBAND</p>
+                  <b>CHOUDHRY'S FATHER</b>
                 </td>
-                <td STYLE="min-width: 50%;flex: 1; display: flex; align-items: center; font-size: 12px">
-                  <p STYLE="margin: 0; min-width: 10rem">
-                    REGISTERATION LOCATION
-                  </p>
-                  <b STYLE="margin: 0">SHAMIM ARSHAD CLINIC</b>
+                <td className="info">
+                  <p style={{ minWidth: '160px' }}>REGISTERATION LOCATION</p>
+                  <p>SHAMIM ARSHAD CLINIC</p>
                 </td>
               </tr>
-              <tr STYLE="min-height: 1.25rem; display: flex; font-size: 12px;width:100%">
-                <td
-                  colSpan="2"
-                  STYLE="
-                min-width: 50%;
-                flex: 1;
-                display: flex;
-                align-items: flex-start;
-              "
-                >
-                  <p STYLE="margin: 0; min-width: 8rem">AGE / SEX</p>
-                  <b STYLE="margin: 0">8 / MALE</b>
+              <tr className="info-row">
+                <td colSpan="2" className="info">
+                  <p style={{ minWidth: '8rem' }}>AGE / SEX</p>
+                  <b>8 / MALE</b>
                 </td>
               </tr>
             </tbody>
           </table>
 
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item, i) => {
+          {[1, 2, 3, 4, 5].map((item, i) => {
             return (
-              <div STYLE="border:2px solid black;">
-                <table
-                  id={'tbl-' + item}
-                  key={item}
-                  ref={(el) => (tablesRef.current[i] = el)}
-                  className="table"
-                  STYLE="width: 100%; border-collapse: collapse; margin: 0 0 2.5rem;"
-                >
-                  <tbody>
-                    <tr>
-                      <td
-                        STYLE="margin: 0 1rem 1rem 0.5rem; font-size: 18px;font-weight:bold;text-align:center;"
-                        colSpan="3"
-                      >
-                        LIVER FUNCTION TEST
-                      </td>
-                    </tr>
-                    <tr STYLE="display: flex;border:2px solid black; font-size:14px;">
-                      <td
-                        STYLE="
-                    padding: 0.15rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: bold;
-                    flex: 1;
-                  "
-                      >
-                        TEST NAME
-                      </td>
-                      <td
-                        STYLE="
-                    padding: 0.15rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: bold;
-                    flex: 1;
-                  "
-                      >
-                        RESULT
-                      </td>
-                      <td
-                        STYLE="
-                    padding: 0.15rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: bold;
-                    flex: 1;
-                  "
-                      >
-                        NORMAL VALUE
-                      </td>
-                    </tr>
-                    <tr STYLE="display: flex; font-size: 14px">
-                      <td
-                        STYLE="
-                    padding: 0.15rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: bold;
-                    flex: 1;
-                  "
-                      >
-                        S. GPT (ALT)
-                      </td>
-                      <td
-                        STYLE="
-                    padding: 0.15rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: bold;
-                    flex: 1;
-                  "
-                      >
-                        25
-                      </td>
-                      <td
-                        STYLE="
-                    padding: 0.15rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex: 1;
-                  "
-                      >
-                        F=31mg% M=40mg%
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <table id={'tbl-' + item} key={item} className="table test-table">
+                <tbody>
+                  <tr>
+                    <td
+                      style={{
+                        margin: '0 1rem 1rem 0.5rem',
+                        fontSize: '18px',
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                      }}
+                      colSpan="3"
+                    >
+                      LIVER FUNCTION TEST
+                    </td>
+                  </tr>
+                  <tr className="test-table-row table-col-head">
+                    <td className="test-col">TEST NAME</td>
+                    <td className="test-col">RESULT</td>
+                    <td className="test-col">NORMAL VALUE</td>
+                  </tr>
+                  <tr className="test-table-row">
+                    <td className="table-data">S. GPT (ALT)</td>
+                    <td className="table-data">25</td>
+                    <td className="table-data table-data-light">
+                      F=31mg% M=40mg%
+                    </td>
+                  </tr>
+                </tbody>
+                <div style={{ height: '128px' }}></div>
+              </table>
             );
           })}
         </div>
       </div>
-      <Button type="primary" id="print-button" onClick={handlePrint}>
-        Print
-      </Button>
     </>
   );
 };
