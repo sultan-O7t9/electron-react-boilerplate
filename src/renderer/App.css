@@ -1,7 +1,11 @@
-@import '~antd/dist/antd.css';
-
+/* @import '~antd/dist/antd.css'; */
+:root {
+  --primary: rgb(115, 101, 249);
+}
 * {
   margin: 0;
   box-sizing: border-box;
   padding: 0;
+  font-family: sans-serif;
+  /* background-color: var(--primary); */
 }
