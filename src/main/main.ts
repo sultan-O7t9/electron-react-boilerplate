@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+const sqlite3 = require('sqlite3');
 
 class AppUpdater {
   constructor() {
@@ -105,6 +106,7 @@ const createWindow = async () => {
 };
 
 let newWindow;
+let db: any = null;
 
 function createNewWindow(url: string) {
   newWindow = new BrowserWindow({
@@ -125,6 +127,36 @@ function createNewWindow(url: string) {
 ipcMain.on('show-generated-pdf', async (event, arg) => {
   createNewWindow(arg);
 });
+ipcMain.on('EXEC_QUERY', async (event, sqlQuery) => {
+  let data = {};
+
+  db.all(sqlQuery, (err: any, rows: any) => {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log(rows);
+      event.reply('EXEC_QUERY', rows);
+    }
+  });
+  console.log('EXEC_QUERY: ', sqlQuery);
+});
+ipcMain.on('hello', (event, arg) => {
+  const { product } = arg;
+  db.exec(
+    `
+  CREATE TABLE If not exists sharks 
+  (
+    ID INTEGER PRIMARY KEY ,
+    name   VARCHAR(50) NOT NULL,
+    color   VARCHAR(50) NOT NULL,
+    weight INTEGER NOT NULL
+  );
+`,
+  );
+  event.reply('hello', 'pong');
+
+  console.log(product);
+});
 
 /**
  * Add event listeners...
@@ -142,6 +174,29 @@ app
   .whenReady()
   .then(() => {
     createWindow();
+    db = new sqlite3.Database(
+      path.join(path.join(app.getPath('documents'), 'db.db')),
+    );
+    db.serialize(() => {
+      db.run(`CREATE TABLE IF NOT EXISTS patient (
+        patient_id INTEGER PRIMARY KEY ,
+        patient_name TEXT,
+        age INTEGER,
+        gender TEXT
+      );`);
+      db.run(`CREATE TABLE IF NOT EXISTS test_type (
+        type_id INTEGER PRIMARY KEY,
+        type_name TEXT
+      );`);
+      db.run(`CREATE TABLE IF NOT EXISTS test (
+        test_id INTEGER PRIMARY KEY ,
+        test_name TEXT,
+        normal_value TEXT,
+        type_id INTEGER,
+        FOREIGN KEY (type_id) REFERENCES test_type(type_id)
+      );`);
+    });
+
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.

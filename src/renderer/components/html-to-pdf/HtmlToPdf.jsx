@@ -85,7 +85,7 @@ const HtmlToPdf = () => {
       });
   };
   return (
-    <>
+    <div className="html-to-pdf">
       <Button type="primary" id="print-button" onClick={handlePrint}>
         Print
       </Button>
@@ -223,7 +223,7 @@ const HtmlToPdf = () => {
           })}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 export default HtmlToPdf;

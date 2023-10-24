@@ -1,9 +1,20 @@
 import { Button, Input, Radio } from 'antd';
 import './styles.css';
+import { useEffect } from 'react';
 
 const AddReportPage = () => {
+  useEffect(() => {
+    window.electron.ipcRenderer.on('hello', (e, a) => {
+      console.log('RETURNED');
+    });
+  }, []);
+
+  const onClick = () => {
+    window.electron.ipcRenderer.sendMessage('hello', 'asdfgh');
+  };
   return (
     <section className="main-section">
+      <button onClick={onClick}>Hello</button>
       <form>
         <section className="patient-section section">
           <h4 className="section-title">Patient Details</h4>

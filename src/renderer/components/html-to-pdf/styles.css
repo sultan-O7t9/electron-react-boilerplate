@@ -1,18 +1,18 @@
-.hide {
+.html-to-pdf .hide {
   visibility: hidden;
   /* position: absolute; */
   position: fixed;
   /* opacity: 0; */
 }
-p {
+.html-to-pdf p {
   font-size: 10px;
   margin: 0;
 }
-b {
+.html-to-pdf b {
   font-size: 12px;
   margin: 0;
 }
-.test-col {
+.html-to-pdf .test-col {
   padding: 0.15rem;
   display: flex;
   align-items: center;
@@ -20,20 +20,20 @@ b {
   font-weight: bold;
   flex: 1;
 }
-.test-table {
+.html-to-pdf .test-table {
   width: 100%;
   border-collapse: collapse;
   margin: 0;
 }
 
-.test-table-row {
+.html-to-pdf .test-table-row {
   display: flex;
   font-size: 14px;
 }
-.table-col-head {
+.html-to-pdf .table-col-head {
   border: 2px solid black;
 }
-.table-data {
+.html-to-pdf .table-data {
   padding-top: 1rem;
   display: flex;
   align-items: center;
@@ -41,15 +41,15 @@ b {
   font-weight: bold;
   flex: 1;
 }
-.table-data-light {
+.html-to-pdf .table-data-light {
   font-weight: normal;
 }
-.info-row {
+.html-to-pdf .info-row {
   min-height: 24px;
   display: flex;
   font-size: 12px;
 }
-.info {
+.html-to-pdf .info {
   flex: 1;
   min-width: 50%;
   display: flex;
