@@ -4,7 +4,8 @@ import './styles.css';
 import { Button } from 'antd';
 import html2pdf from 'html2pdf.js';
 const { ipcRenderer } = window.electron;
-const HtmlToPdf = () => {
+const HtmlToPdf = (props) => {
+  const { data, closeModal } = props;
   const docHeight = 1038;
   const footerHeight = 21;
   const docWidth = 709;
@@ -13,6 +14,7 @@ const HtmlToPdf = () => {
   const [link, setLink] = useState('');
 
   const handlePrint = () => {
+    console.log({ data });
     window.scrollTo(0, 0);
     var doc = new jsPDF('p', 'pt', 'a4');
     let paperHeight = docHeight;
@@ -80,14 +82,28 @@ const HtmlToPdf = () => {
       .toPdf()
       .get('pdf')
       .then((pdf) => {
+        pdf.setFontSize(14);
+        const totalPages = pdf.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+          pdf.text(
+            'LAB TECH _____________________',
+            pdf.internal.pageSize.width - 250,
+            pdf.internal.pageSize.height - 20,
+          );
+        }
+
         const l = pdf.output('bloburl');
+        console.log(l);
+
         window.electron.ipcRenderer.sendMessage('show-generated-pdf', l);
+        closeModal();
       });
   };
   return (
     <div className="html-to-pdf">
       <Button type="primary" id="print-button" onClick={handlePrint}>
-        Print
+        Print PDF
       </Button>
       <div className="hide">
         <div
@@ -101,32 +117,8 @@ const HtmlToPdf = () => {
             position: 'relative',
           }}
         >
-          {new Array(docPages).fill(1).map((el, i) => {
-            return (
-              <div
-                id="tech-sign"
-                key={i}
-                style={{
-                  position: 'absolute',
-                  top: (i + 1) * docHeight - footerHeight,
-                  right: 0,
-                }}
-              >
-                LAB TECH________________________
-              </div>
-            );
-          })}
-          <h1
-            style={{
-              textTransform: 'uppercase',
-              textDecoration: 'underline',
-              fontWeight: 'bold',
-              textAlign: 'center',
-              margin: ' 0 0 8px',
-              fontFamily: 'serif',
-            }}
-          >
-            SClinic
+          <h1 STYLE="text-transform: uppercase; text-decoration: underline; font-weight: bold; text-align: center; margin:  0 0 8px; font-family:  serif;">
+            {window.localStorage.getItem('CLINIC_NAME') ?? ''}
           </h1>
           <div
             style={{
@@ -134,90 +126,146 @@ const HtmlToPdf = () => {
               textAlign: 'center',
               fontFamily: 'sans-serif',
             }}
+            STYLE="text-transform: uppercase; text-align: center; font-family:  sans-serif;"
           >
-            <b>not valid for any court</b>
-            <p>
-              Opposite Fauji Tower Eid Gaah Chowk, <b>Kunjah</b>
+            <b STYLE="font-size: 12px; margin: 0;">not valid for any court</b>
+            <p STYLE="font-size: 10px; margin: 0;">
+              {window.localStorage.getItem('CLINIC_LOCATION') ?? ''},{' '}
+              <b STYLE="font-size: 12px; margin: 0;">
+                {window.localStorage.getItem('CLINIC_CITY') ?? ''}
+              </b>
             </p>
-            <p style={{ marginBottom: '48px' }}>
-              cell number --- <b>0349 4695920</b>
+            <p STYLE="font-size: 10px; margin: 0; margin-bottom: 48px;">
+              cell number ---{' '}
+              <b STYLE="font-size: 12px; margin: 0;">
+                {window.localStorage.getItem('CLINIC_CONTACT') ?? ''}
+              </b>
             </p>
           </div>
 
-          <table style={{ width: '100%', margin: '0 auto 64px' }}>
+          <table STYLE="width: 100%; margin: 0 auto 64px;">
             <tbody>
-              <tr className="info-row">
-                <td className="info">
-                  <p style={{ minWidth: '128px' }}>
+              <tr STYLE="min-height:  24px; display:  flex; font-size:  12px;">
+                <td STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;">
+                  <p STYLE="font-size: 10px; margin: 0; min-width: 128px;">
                     REPORT <span>#</span>
                   </p>
-                  <p>8975984092</p>
+                  <p STYLE="font-size: 10px; margin: 0;">
+                    {data?.report?.report_id}
+                  </p>
                 </td>
-                <td className="info">
-                  <p style={{ minWidth: '160px' }}>REGISTRATION DATE</p>
-                  <p>20-10-2023</p>
-                </td>
-              </tr>
-              <tr className="info-row">
-                <td className="info">
-                  <p style={{ minWidth: '128px' }}>PATIENT NAME</p>
-                  <b>CHAUDHRY RANA FAIZAN BHUTTA</b>
-                </td>
-                <td className="info">
-                  <p style={{ minWidth: '160px' }}>REPORT COLLECTION DATE</p>
-                  <p>20-10-2023</p>
+                <td STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;">
+                  <p STYLE="font-size: 10px; margin: 0; min-width:  160px;">
+                    REGISTRATION DATE
+                  </p>
+                  <p STYLE="font-size: 10px; margin: 0;">
+                    {new Date(data?.report?.registration_date).toDateString()}
+                  </p>
                 </td>
               </tr>
-              <tr className="info-row">
-                <td className="info">
-                  <p style={{ minWidth: '128px' }}>FATHER / HUSBAND</p>
-                  <b>CHOUDHRY'S FATHER</b>
+              <tr STYLE="min-height:  24px; display:  flex; font-size:  12px;">
+                <td STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;">
+                  <p STYLE="font-size: 10px; margin: 0; min-width: 128px;">
+                    PATIENT NAME
+                  </p>
+                  <b STYLE="font-size: 12px; margin: 0;">
+                    {data?.patient?.patient_name?.split('---')[0]}
+                  </b>
                 </td>
-                <td className="info">
-                  <p style={{ minWidth: '160px' }}>REGISTERATION LOCATION</p>
-                  <p>SHAMIM ARSHAD CLINIC</p>
+                <td STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;">
+                  <p STYLE="font-size: 10px; margin: 0; min-width: 160px;">
+                    REPORT COLLECTION DATE
+                  </p>
+                  <p STYLE="font-size: 10px; margin: 0;">
+                    {new Date(data?.report?.collection_date).toDateString()}
+                  </p>
                 </td>
               </tr>
-              <tr className="info-row">
-                <td colSpan="2" className="info">
-                  <p style={{ minWidth: '8rem' }}>AGE / SEX</p>
-                  <b>8 / MALE</b>
+              <tr STYLE="min-height:  24px; display:  flex; font-size:  12px;">
+                <td STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;">
+                  <p STYLE="font-size: 10px; margin: 0; min-width: 128px;">
+                    FATHER / HUSBAND
+                  </p>
+                  <b STYLE="font-size: 12px; margin: 0;">
+                    {data?.patient?.patient_name?.split('---')[1]}
+                  </b>
+                </td>
+                <td STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;">
+                  <p STYLE="font-size: 10px; margin: 0; min-width: 160px;">
+                    REGISTERATION LOCATION
+                  </p>
+                  <p STYLE="font-size: 10px; margin: 0;">
+                    {window.localStorage.getItem('REGISTRATION_LOCATION') ?? ''}
+                  </p>
+                </td>
+              </tr>
+              <tr STYLE="min-height:  24px; display:  flex; font-size:  12px;">
+                <td
+                  colSpan="2"
+                  STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;"
+                >
+                  <p STYLE="font-size: 10px; margin: 0; min-width: 8rem;">
+                    AGE / SEX
+                  </p>
+                  <b STYLE="font-size: 12px; margin: 0;">
+                    {data?.patient?.age} / {data?.patient?.gender}
+                  </b>
                 </td>
               </tr>
             </tbody>
           </table>
 
-          {[1, 2, 3, 4, 5].map((item, i) => {
+          {data?.tests?.map((item, i) => {
             return (
-              <table id={'tbl-' + item} key={item} className="table test-table">
+              <table
+                key={item?.type_id}
+                id={'tbl-' + item}
+                key={item}
+                className="table"
+                STYLE="width:  100%; border-collapse:  collapse; margin:  0;"
+              >
                 <tbody>
                   <tr>
                     <td
-                      style={{
-                        margin: '0 1rem 1rem 0.5rem',
-                        fontSize: '18px',
-                        fontWeight: 'bold',
-                        textAlign: 'center',
-                      }}
+                      STYLE="margin: 0 1rem 1rem 0; padding-bottom:0.75rem font-size: 18px; font-weight: bold;
+                        text-align: center;"
                       colSpan="3"
                     >
-                      LIVER FUNCTION TEST
+                      {item?.type_name}
                     </td>
                   </tr>
-                  <tr className="test-table-row table-col-head">
-                    <td className="test-col">TEST NAME</td>
-                    <td className="test-col">RESULT</td>
-                    <td className="test-col">NORMAL VALUE</td>
-                  </tr>
-                  <tr className="test-table-row">
-                    <td className="table-data">S. GPT (ALT)</td>
-                    <td className="table-data">25</td>
-                    <td className="table-data table-data-light">
-                      F=31mg% M=40mg%
+                  <tr
+                    STYLE="border:  2px solid black; display:  flex;
+                    font-size:  14px;"
+                  >
+                    <td STYLE="padding:  0.15rem;display:  flex;align-items:  center; justify-content:  center;font-weight:  bold; flex:  1;">
+                      TEST NAME
+                    </td>
+                    <td STYLE="padding:  0.15rem; display:  flex; align-items:  center; justify-content:  center; font-weight:  bold; flex:  1;">
+                      RESULT
+                    </td>
+                    <td STYLE="padding:  0.15rem; display:  flex; align-items:  center; justify-content:  center; font-weight:  bold; flex:  1;">
+                      NORMAL VALUE
                     </td>
                   </tr>
+                  {item?.data?.map((test) => (
+                    <tr
+                      key={test?.test_id}
+                      STYLE="display:  flex; font-size:  14px;"
+                    >
+                      <td STYLE="padding-top:  1rem; display:  flex; align-items:  center; justify-content:  center; font-weight:  bold; flex:  1;">
+                        {test?.test_name}
+                      </td>
+                      <td STYLE="padding-top:  1rem; display:  flex; align-items:  center; justify-content:  center; font-weight:  bold; flex:  1;">
+                        {test?.result}
+                      </td>
+                      <td STYLE="padding-top:  1rem; display:  flex; align-items:  center; justify-content:  center; flex:  1;">
+                        {test?.normal_value ? test?.normal_value : '-'}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
-                <div style={{ height: '128px' }}></div>
+                <div STYLE="height: 128px;"></div>
               </table>
             );
           })}

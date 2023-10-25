@@ -8,64 +8,62 @@ import './styles.global.scss';
 import HtmlToPdf from './components/html-to-pdf/HtmlToPdf';
 import './App.css';
 import MainHeader from './components/main-header/MainHeader';
-import AddReportPage from './components/add-report/AddReportPage';
-import AddTypePage from './components/add-type/AddType';
-import { notification } from 'antd';
+import { ConfigProvider, notification } from 'antd';
 import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 import MainSidebar from './components/main-sidebar/MainSidebar';
-import ManageTestPage from './manage-test/ManageTest';
-
-function Hello() {
-  const navigate = useNavigate();
-
-  return (
-    <div>
-      {/* <AddReportPage /> */}
-      <AddTypePage />
-    </div>
-  );
-}
-function Login() {
-  return <div>Login</div>;
-}
+import ManageTestPage from './screens/manage-test/ManageTest';
+import ManageTestTypePage from './screens/manage-test-type/ManageTestType';
+import AddReportPage from './screens/add-report/AddReport';
+import AllReportsPage from './screens/all-reports/AllReports';
+import SettingsPage from './screens/settings/Settings';
 
 const RoutesContainer = () => {
   return (
     <Routes>
-      <Route path="/" element={<Hello />} />
-      <Route path="/abc" element={<Login />} />
+      <Route path="/" element={<AddReportPage />} />
+      <Route path="/reports" element={<AllReportsPage />} />
+      <Route path="/manage-test-type" element={<ManageTestTypePage />} />
       <Route path="/manage-test" element={<ManageTestPage />} />
+      <Route path="/config" element={<SettingsPage />} />
     </Routes>
   );
 };
 
 export default function App() {
   return (
-    <div>
-      <Router>
-        <div className="layout">
-          <MainSidebar />
-          <div style={{ flex: 1 }}>
-            <MainHeader />
-            <RoutesContainer />
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: 'rgb(115, 101, 249)',
+        },
+      }}
+    >
+      <div>
+        <Router>
+          <div className="layout">
+            <MainSidebar />
+            <div style={{ flex: 1 }}>
+              <MainHeader />
+              <RoutesContainer />
+            </div>
           </div>
-        </div>
-      </Router>
+        </Router>
 
-      <ToastContainer
-        position="bottom-right"
-        autoClose={2500}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss={false}
-        draggable={false}
-        pauseOnHover={false}
-        theme="light"
-      />
-    </div>
+        <ToastContainer
+          position="bottom-right"
+          autoClose={2500}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss={false}
+          draggable={false}
+          pauseOnHover={false}
+          theme="light"
+        />
+      </div>
+    </ConfigProvider>
   );
 }

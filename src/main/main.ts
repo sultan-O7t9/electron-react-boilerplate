@@ -209,6 +209,23 @@ app
         type_id INTEGER,
         FOREIGN KEY (type_id) REFERENCES test_type(type_id)
       );`);
+      db.run(`
+      CREATE TABLE IF NOT EXISTS report (
+        report_id INTEGER PRIMARY KEY,
+        registration_date DATETIME,
+        collection_date DATETIME,
+        patient_id INTEGER,
+        FOREIGN KEY (patient_id) REFERENCES patient(patient_id)
+      );`);
+      db.run(`
+      CREATE TABLE IF NOT EXISTS test_report (
+        report_id INTEGER,
+        test_id INTEGER,
+        result TEXT,
+        FOREIGN KEY (report_id) REFERENCES report (report_id),
+        FOREIGN KEY (test_id) REFERENCES test (test_id),
+        PRIMARY KEY (report_id, test_id)
+      );`);
     });
 
     app.on('activate', () => {

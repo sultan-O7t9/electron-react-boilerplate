@@ -1,58 +1,62 @@
 .html-to-pdf .hide {
-  visibility: hidden;
+  /* visibility: hidden; */
+  opacity: 0;
+  pointer-events: none;
   /* position: absolute; */
   position: fixed;
+  left: 0;
+  top: 0;
   /* opacity: 0; */
 }
-.html-to-pdf p {
+/* .html-to-pdf p {
   font-size: 10px;
   margin: 0;
 }
 .html-to-pdf b {
   font-size: 12px;
   margin: 0;
-}
-.html-to-pdf .test-col {
+} */
+/* .html-to-pdf .test-col {
   padding: 0.15rem;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   flex: 1;
-}
-.html-to-pdf .test-table {
+} */
+/* .html-to-pdf .test-table {
   width: 100%;
   border-collapse: collapse;
   margin: 0;
-}
+} */
 
-.html-to-pdf .test-table-row {
+/* .html-to-pdf .test-table-row {
   display: flex;
   font-size: 14px;
-}
-.html-to-pdf .table-col-head {
+} */
+/* .html-to-pdf .table-col-head {
   border: 2px solid black;
-}
-.html-to-pdf .table-data {
+} */
+/* .html-to-pdf .table-data {
   padding-top: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   flex: 1;
-}
-.html-to-pdf .table-data-light {
+} */
+/* .html-to-pdf .table-data-light {
   font-weight: normal;
-}
-.html-to-pdf .info-row {
+} */
+/* .html-to-pdf .info-row {
   min-height: 24px;
   display: flex;
   font-size: 12px;
-}
-.html-to-pdf .info {
+} */
+/* .html-to-pdf .info {
   flex: 1;
   min-width: 50%;
   display: flex;
   align-items: center;
   margin-right: 1rem;
-}
+} */

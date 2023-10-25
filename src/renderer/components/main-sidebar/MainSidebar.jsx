@@ -1,6 +1,11 @@
 import React from 'react';
 import './styles.css';
-import { GroupOutlined, HomeOutlined } from '@ant-design/icons';
+import {
+  GroupOutlined,
+  HomeOutlined,
+  ProfileOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 
 const SidebarLink = ({ to, label, icon }) => {
@@ -19,13 +24,18 @@ const SidebarLink = ({ to, label, icon }) => {
 const MainSidebar = () => {
   const links = [
     {
-      label: 'Home',
+      label: 'Add Report',
       to: '/',
-      icon: <HomeOutlined />,
+      icon: <ProfileOutlined />,
+    },
+    {
+      label: 'All Reports',
+      to: '/reports',
+      icon: <ProfileOutlined />,
     },
     {
       label: 'Test Types',
-      to: '/',
+      to: '/manage-test-type',
       icon: <GroupOutlined />,
     },
     {
@@ -33,18 +43,26 @@ const MainSidebar = () => {
       to: '/manage-test',
       icon: <GroupOutlined />,
     },
+    {
+      label: 'Settings',
+      to: '/config',
+      icon: <SettingOutlined />,
+    },
   ];
   return (
-    <div className="main-sidebar">
-      {links.map((link) => (
-        <SidebarLink
-          key={link.to}
-          to={link.to}
-          label={link.label}
-          icon={link.icon}
-        />
-      ))}
-    </div>
+    <>
+      <div className="main-sidebar" style={{ position: 'relative' }}></div>
+      <div className="main-sidebar">
+        {links.map((link) => (
+          <SidebarLink
+            key={link.to}
+            to={link.to}
+            label={link.label}
+            icon={link.icon}
+          />
+        ))}
+      </div>
+    </>
   );
 };
 

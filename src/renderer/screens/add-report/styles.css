@@ -1,0 +1,35 @@
+.type-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0.5rem 1rem;
+}
+.type-table > b {
+  font-size: 20px;
+  align-self: center;
+  margin-bottom: 0.5rem;
+}
+
+.test-table {
+  display: flex;
+  flex-direction: column;
+}
+.test-table .head,
+.test-table .row {
+  display: flex;
+  align-items: center;
+  padding-top: 0.25rem;
+}
+.test-table .head {
+  padding: 0.25rem;
+  border: 2px solid black;
+}
+
+.test-table .head .test-title {
+  font-weight: bold;
+}
+.test-table .head .test-title,
+.test-table .row .test-col {
+  flex: 1;
+  text-align: center;
+}

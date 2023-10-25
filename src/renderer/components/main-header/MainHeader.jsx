@@ -36,8 +36,9 @@ const MainHeader = () => {
           />
         </Tooltip>
       </nav>
-      {/* <h3 className="header-title">SHAMIM ARSHAD CLINIC</h3> */}
-      <h3 className="header-title">ABC</h3>
+      <h3 className="header-title">
+        {window.localStorage.getItem('CLINIC_NAME') ?? ''}
+      </h3>
     </header>
   );
 };

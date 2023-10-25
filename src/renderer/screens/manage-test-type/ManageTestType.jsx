@@ -1,41 +1,48 @@
 import { Button, Radio, Table } from 'antd';
 import './styles.css';
 import { useEffect, useState } from 'react';
-import useQuery from '../../../hooks/useQuery';
-import useMutation from '../../../hooks/useMutation';
 import { PlusOutlined } from '@ant-design/icons';
-import Input from '../input/Input';
 import { toast } from 'react-toastify';
+import Input from '../../components/input/Input';
+import useMutation from '../../../hooks/useMutation';
+import useQuery from '../../../hooks/useQuery';
 
-const AddTypePage = () => {
+const ManageTestType = () => {
   const [type, setType] = useState('');
+  const [types, setTypes] = useState([]);
   const [typeError, setTypeError] = useState('');
   const TYPE_ERROR = 'Please fill the input';
 
-  const [types, getAllTypes] = useQuery(`SELECT * FROM test_type`);
-  const addType = useMutation();
+  const [getTypesLoading, getAllTypes] = useQuery(`SELECT * FROM test_type`);
+  const [addTypeLoading, addType] = useMutation();
+
+  const getAllTypesFromDB = async () => {
+    let response = await getAllTypes();
+    setTypes(response.data);
+  };
+
   useEffect(() => {
-    getAllTypes();
+    getAllTypesFromDB();
   }, []);
 
   useEffect(() => {
     if (type) setTypeError('');
   }, [type]);
 
-  const handleAddData = () => {
+  const handleAddData = async () => {
     if (!type) {
       setTypeError(TYPE_ERROR);
       return;
     }
     const query = `INSERT INTO test_type (type_name) VALUES
-   ('${type}');`;
-    addType(query);
-    toast.success(() => (
+   ('${type.toUpperCase()}');`;
+
+    await addType(query, () => (
       <p>
         Test Type: <b>{type}</b> has been added successfully!
       </p>
     ));
-    getAllTypes();
+    getAllTypesFromDB();
   };
 
   const handleChange = (e) => {
@@ -62,16 +69,17 @@ const AddTypePage = () => {
           <h4 className="section-title">Add Test Type</h4>
           <div className="patient-info">
             <Input
-              label={'Enter Test Type'}
+              label={'Test Type'}
               error={typeError}
               size="large"
-              placeholder="Test Type"
+              placeholder="Enter Test Type"
               value={type}
               onChange={handleChange}
             />
           </div>
           <Button
             size="large"
+            disabled={!type}
             type="primary"
             onClick={handleAddData}
             icon={<PlusOutlined />}
@@ -83,9 +91,9 @@ const AddTypePage = () => {
       <section className="section">
         <h4 className="section-title">All Test Types</h4>
 
-        <Table dataSource={types} columns={columns} />
+        <Table dataSource={types} columns={columns} loading={getTypesLoading} />
       </section>
     </section>
   );
 };
-export default AddTypePage;
+export default ManageTestType;

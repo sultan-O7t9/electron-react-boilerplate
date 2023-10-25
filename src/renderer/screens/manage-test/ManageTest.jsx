@@ -3,9 +3,9 @@ import './styles.css';
 import { useEffect, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
-import useMutation from '../../hooks/useMutation';
-import useQuery from '../../hooks/useQuery';
-import Input from '../components/input/Input';
+import useMutation from '../../../hooks/useMutation';
+import useQuery from '../../../hooks/useQuery';
+import Input from '../../components/input/Input';
 
 const ManageTestPage = () => {
   const [testType, setTestType] = useState('');
@@ -19,45 +19,56 @@ const ManageTestPage = () => {
   });
   const ERROR_MSG = 'Please fill the input';
 
-  //   const [getAllTests] = useQuery(
-  //     `SELECT * FROM test t, test_type tt right join test_type on t.type_id = tt.type_id;`,
-  //     setTests,
-  //   );
+  const [testsLoading, getAllTests] = useQuery(
+    `SELECT test.test_id, test.test_name, test.normal_value, test.type_id, test_type.type_name
+    FROM test
+    INNER JOIN test_type ON test.type_id = test_type.type_id`,
+  );
+  const [typesLoading, getAllTypes] = useQuery(`SELECT * FROM test_type`);
 
-  //   const [getAllTypes] = useQuery(`SELECT * FROM test_type;`, setTypes);
+  const addType = useMutation();
+  const fetchAllTests = () => {
+    getAllTests().then((response) => {
+      setTests(response?.data);
+    });
+  };
+  useEffect(() => {
+    getAllTypes().then((response) => {
+      setTypes(
+        response?.data?.map((type) => ({
+          label: type?.type_name,
+          value: type?.type_id,
+        })),
+      );
+    });
+    fetchAllTests();
+  }, []);
 
-  const addTest = useMutation();
-  //   useEffect(() => {
-  // getAllTests();
-  // getAllTypes();
-  //   }, []);
-
-  //   useEffect(() => {
-  //     console.log(tests, 'TESTS');
-  //   }, [tests]);
+  const [addTestLoading, addTest] = useMutation();
 
   useEffect(() => {
     if (testType) setErrors((state) => ({ ...state, type: '' }));
     if (testName) setErrors((state) => ({ ...state, name: '' }));
   }, [testType, testName]);
 
-  const handleAddData = () => {
-    //     if (!testType) {
-    //       setErrors((state) => ({ ...state, type: ERROR_MSG }));
-    //     }
-    //     if (!testName) {
-    //       setErrors((state) => ({ ...state, name: ERROR_MSG }));
-    //     }
-    //     if (!testType || !testName) return;
-    //     const query = `INSERT INTO test (type_id,test_name,normal_value) VALUES
-    //    (${testType},'${testName}','${testNormalValue}');`;
-    //     addTest(query);
-    //     toast.success(() => (
-    //       <p>
-    //         Test: <b>{testName}</b> has been added successfully!
-    //       </p>
-    //     ));
-    // getAllTests();
+  const handleAddData = async () => {
+    if (!testType) {
+      setErrors((state) => ({ ...state, type: ERROR_MSG }));
+    }
+    if (!testName) {
+      setErrors((state) => ({ ...state, name: ERROR_MSG }));
+    }
+    if (!testType || !testName) return;
+    console.log(testType, testName, testNormalValue);
+    const query = `INSERT INTO test (type_id,test_name,normal_value) VALUES
+       (${testType},'${testName.toUpperCase()}','${
+         testNormalValue ? testNormalValue : '-'
+       }');`;
+    await addTest(query, () => (
+      <p>Test: {testName.toUpperCase()} added successfully!</p>
+    ));
+
+    fetchAllTests();
   };
 
   const columns = [
@@ -108,7 +119,7 @@ const ManageTestPage = () => {
                 label={'Test Name'}
                 error={errors.name}
                 size="large"
-                placeholder="Test Name"
+                placeholder="Enter Test Name"
                 value={testName}
                 onChange={handleNameChange}
               />
@@ -130,31 +141,26 @@ const ManageTestPage = () => {
                   placeholder="Select Test Type"
                   optionFilterProp="children"
                   onChange={handleTypeChange}
-                  //   onSearch={onSearch}
-                  //   filterOption={filterOption}
-                  options={types.map((type) => ({
-                    label: type?.type_name,
-                    value: type?.type_id,
-                  }))}
+                  options={types}
                 />
               </div>
             </div>
           </div>
           <Button
             size="large"
+            disabled={!testName || !testType}
             type="primary"
             onClick={handleAddData}
             icon={<PlusOutlined />}
           >
-            Add Type
+            Add Test
           </Button>
         </section>
       </form>
       <section className="section">
         <h4 className="section-title">All Tests</h4>
-        {JSON.stringify(tests)}
 
-        <Table dataSource={tests} columns={columns} />
+        <Table dataSource={tests} columns={columns} loading={testsLoading} />
       </section>
     </section>
   );
