@@ -3,7 +3,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 const { jsPDF } = require('jspdf');
 
-export type Channels = 'show-generated-pdf' | 'EXEC_QUERY';
+export type Channels = 'show-generated-pdf';
 
 const electronHandler = {
   ipcRenderer: {
@@ -21,6 +21,9 @@ const electronHandler = {
     },
     once(channel: Channels, func: (...args: unknown[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
+    },
+    queryDatabase: (sql: string) => {
+      return ipcRenderer.invoke('EXEC_QUERY', sql);
     },
   },
   api: {

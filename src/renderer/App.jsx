@@ -15,6 +15,7 @@ import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 import MainSidebar from './components/main-sidebar/MainSidebar';
+import ManageTestPage from './manage-test/ManageTest';
 
 function Hello() {
   const navigate = useNavigate();
@@ -35,6 +36,7 @@ const RoutesContainer = () => {
     <Routes>
       <Route path="/" element={<Hello />} />
       <Route path="/abc" element={<Login />} />
+      <Route path="/manage-test" element={<ManageTestPage />} />
     </Routes>
   );
 };

@@ -28,6 +28,11 @@ const MainSidebar = () => {
       to: '/',
       icon: <GroupOutlined />,
     },
+    {
+      label: 'Tests',
+      to: '/manage-test',
+      icon: <GroupOutlined />,
+    },
   ];
   return (
     <div className="main-sidebar">

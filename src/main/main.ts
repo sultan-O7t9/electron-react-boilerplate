@@ -133,9 +133,10 @@ ipcMain.on('EXEC_QUERY', async (event, sqlQuery) => {
   db.all(sqlQuery, (err: any, rows: any) => {
     if (err) {
       console.error(err);
+      event.reply('EXEC_QUERY', { status: 'error', data: err });
     } else {
       console.log(rows);
-      event.reply('EXEC_QUERY', rows);
+      event.reply('EXEC_QUERY', { status: 'success', data: rows });
     }
   });
   console.log('EXEC_QUERY: ', sqlQuery);
@@ -161,6 +162,17 @@ ipcMain.on('hello', (event, arg) => {
 /**
  * Add event listeners...
  */
+const execQuery = async (event: any, sql: string) => {
+  return new Promise((resolve, reject) => {
+    db.all(sql, [], (err: any, rows: any) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
@@ -173,7 +185,9 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
+    ipcMain.handle('EXEC_QUERY', execQuery);
     createWindow();
+
     db = new sqlite3.Database(
       path.join(path.join(app.getPath('documents'), 'db.db')),
     );
