@@ -206,6 +206,7 @@ app
         test_id INTEGER PRIMARY KEY ,
         test_name TEXT,
         normal_value TEXT,
+        test_unit TEXT,
         type_id INTEGER,
         FOREIGN KEY (type_id) REFERENCES test_type(type_id)
       );`);

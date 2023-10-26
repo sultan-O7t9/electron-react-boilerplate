@@ -10,6 +10,7 @@ import Input from '../../components/input/Input';
 const ManageTestPage = () => {
   const [testType, setTestType] = useState('');
   const [testName, setTestName] = useState('');
+  const [testUnit, setTestUnit] = useState('');
   const [tests, setTests] = useState([]);
   const [types, setTypes] = useState([]);
   const [testNormalValue, setTestNormalValue] = useState('');
@@ -20,7 +21,7 @@ const ManageTestPage = () => {
   const ERROR_MSG = 'Please fill the input';
 
   const [testsLoading, getAllTests] = useQuery(
-    `SELECT test.test_id, test.test_name, test.normal_value, test.type_id, test_type.type_name
+    `SELECT test.test_id, test.test_name, test.normal_value, test.test_unit, test.type_id, test_type.type_name
     FROM test
     INNER JOIN test_type ON test.type_id = test_type.type_id`,
   );
@@ -59,16 +60,20 @@ const ManageTestPage = () => {
       setErrors((state) => ({ ...state, name: ERROR_MSG }));
     }
     if (!testType || !testName) return;
-    console.log(testType, testName, testNormalValue);
-    const query = `INSERT INTO test (type_id,test_name,normal_value) VALUES
+    console.log(testType, testName, testNormalValue, testUnit);
+
+    const query = `INSERT INTO test (type_id,test_name,normal_value,test_unit) VALUES
        (${testType},'${testName.toUpperCase()}','${
          testNormalValue ? testNormalValue : '-'
-       }');`;
+       }','${testUnit}');`;
     await addTest(query, () => (
       <p>Test: {testName.toUpperCase()} added successfully!</p>
     ));
 
     fetchAllTests();
+    setTestName('');
+    setTestNormalValue('');
+    setTestType('');
   };
 
   const columns = [
@@ -92,6 +97,11 @@ const ManageTestPage = () => {
       dataIndex: 'type_name',
       key: 'type_name',
     },
+    {
+      title: 'Test Unit',
+      dataIndex: 'test_unit',
+      key: 'test_unit',
+    },
   ];
 
   useEffect(() => {
@@ -103,6 +113,9 @@ const ManageTestPage = () => {
   };
   const handleNameChange = (e) => {
     setTestName(e.target.value);
+  };
+  const handleUnitChange = (e) => {
+    setTestUnit(e.target.value);
   };
   const handleNormalValueChange = (e) => {
     setTestNormalValue(e.target.value);
@@ -130,6 +143,14 @@ const ManageTestPage = () => {
                 placeholder="Enter Normal Value"
                 value={testNormalValue}
                 onChange={handleNormalValueChange}
+              />
+              <Input
+                label={'Test Unit'}
+                // error={errors.name}
+                size="large"
+                placeholder="Enter Test Unit"
+                value={testUnit}
+                onChange={handleUnitChange}
               />
               <div style={{ flex: 1 }}>
                 <p className="input-label">Test Type</p>

@@ -2,6 +2,7 @@ import { Button, Input, Radio, Table } from 'antd';
 import './styles.css';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const SYS_CONFIGS = [
   'CLINIC_NAME',
@@ -12,6 +13,7 @@ const SYS_CONFIGS = [
 ];
 
 const SettingsPage = () => {
+  const navigate = useNavigate();
   const [sysConfigs, setSysConfigs] = useState(() => {
     const configs = {};
     SYS_CONFIGS.forEach((config) => {
@@ -28,10 +30,12 @@ const SettingsPage = () => {
       return (
         <div>
           <b>Settings Saved Sucessfully!</b>
-          <p>Restart the Program to see the effect.</p>
         </div>
       );
     });
+    setTimeout(() => {
+      navigate('/config');
+    }, 500);
   };
 
   const handleChange = (config, value) => {

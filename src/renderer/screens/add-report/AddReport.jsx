@@ -1,4 +1,12 @@
-import { Button, Divider, Modal, Radio, Select, Spin } from 'antd';
+import {
+  Button,
+  Divider,
+  Modal,
+  Radio,
+  Select,
+  Spin,
+  Input as AntDInput,
+} from 'antd';
 import './styles.css';
 import { useEffect, useState } from 'react';
 import Input from '../../components/input/Input';
@@ -13,7 +21,7 @@ const AddReportPage = () => {
   const [fName, setFName] = useState('');
   const [lName, setLName] = useState('');
   const [gender, setGender] = useState('MALE');
-  const [age, setAge] = useState(0);
+  const [age, setAge] = useState('');
   const [addRecordLoading, setAddRecordLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [printData, setPrintData] = useState({});
@@ -31,7 +39,7 @@ const AddReportPage = () => {
   };
 
   const [testsLoading, getAllTests] = useQuery(
-    `SELECT test.test_id, test.test_name, test.normal_value, test.type_id, test_type.type_name
+    `SELECT test.test_id, test.test_name, test.test_unit, test.normal_value, test.type_id, test_type.type_name
         FROM test
         INNER JOIN test_type ON test.type_id = test_type.type_id`,
   );
@@ -250,8 +258,17 @@ const AddReportPage = () => {
                       {selectedType.data?.map((test, testIndex) => (
                         <div className="row">
                           <div className="test-col">{test.test_name}</div>
-                          <div className="test-col">
-                            <Input
+                          <div
+                            className="test-col"
+                            style={{
+                              display: 'flex',
+                              gap: '0.5rem',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <AntDInput
+                              style={{ textAlign: 'center', width: '250px' }}
                               value={test.result}
                               onChange={(e) => {
                                 handleResultChange(
@@ -260,9 +277,10 @@ const AddReportPage = () => {
                                   testIndex,
                                 );
                               }}
-                              size="small"
+                              //   size="small"
                               placeholder="Result"
                             />
+                            <p>{test?.test_unit}</p>
                           </div>
                           <div className="test-col">
                             {test.normal_value ? test.normal_value : '-'}
@@ -290,6 +308,7 @@ const AddReportPage = () => {
       </section>
       <Modal
         title="Generate PDF"
+        onCancel={closeModal}
         open={isModalOpen}
         footer={[
           <div
@@ -301,14 +320,14 @@ const AddReportPage = () => {
             }}
           >
             <HtmlToPdf data={printData} closeModal={closeModal} />
-            <Button
+            {/* <Button
               disabled={true}
               type="default"
               onClick={closeModal}
               style={{ marginLeft: '1rem' }}
             >
               Print Later
-            </Button>
+            </Button> */}
           </div>,
         ]}
       >

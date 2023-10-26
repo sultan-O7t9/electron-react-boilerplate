@@ -43,6 +43,7 @@ const ManageTestType = () => {
       </p>
     ));
     getAllTypesFromDB();
+    setType('');
   };
 
   const handleChange = (e) => {

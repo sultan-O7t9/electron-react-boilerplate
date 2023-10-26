@@ -257,7 +257,7 @@ const HtmlToPdf = (props) => {
                         {test?.test_name}
                       </td>
                       <td STYLE="padding-top:  1rem; display:  flex; align-items:  center; justify-content:  center; font-weight:  bold; flex:  1;">
-                        {test?.result}
+                        {test?.result} {test?.test_unit}
                       </td>
                       <td STYLE="padding-top:  1rem; display:  flex; align-items:  center; justify-content:  center; flex:  1;">
                         {test?.normal_value ? test?.normal_value : '-'}

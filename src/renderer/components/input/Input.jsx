@@ -9,6 +9,7 @@ const Input = ({
   error,
   placeholder,
   type = 'text',
+  style = {},
 }) => {
   const errorProps = error ? { status: 'error' } : {};
   return (
@@ -19,6 +20,7 @@ const Input = ({
         type={type}
         placeholder={placeholder}
         value={value}
+        style={style}
         onChange={onChange}
         {...errorProps}
       />
