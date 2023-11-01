@@ -118,7 +118,8 @@ const HtmlToPdf = (props) => {
           }}
         >
           <h1 STYLE="text-transform: uppercase; text-decoration: underline; font-weight: bold; text-align: center; margin:  0 0 8px; font-family:  serif;">
-            {window.localStorage.getItem('CLINIC_NAME') ?? ''}
+            {window.localStorage.getItem('CLINIC_NAME') ??
+              'SHAMIM ARSHAD CLINIC'}
           </h1>
           <div
             style={{
@@ -129,16 +130,19 @@ const HtmlToPdf = (props) => {
             STYLE="text-transform: uppercase; text-align: center; font-family:  sans-serif;"
           >
             <b STYLE="font-size: 12px; margin: 0;">not valid for any court</b>
-            <p STYLE="font-size: 10px; margin: 0;">
-              {window.localStorage.getItem('CLINIC_LOCATION') ?? ''},{' '}
+            <p STYLE="font-size: 12px; margin: 0;">
+              {window.localStorage.getItem('CLINIC_LOCATION') ??
+                'OPPOSITE FAUJI TOWER EID GAAH CHOWK'}
+              ,{' '}
               <b STYLE="font-size: 12px; margin: 0;">
-                {window.localStorage.getItem('CLINIC_CITY') ?? ''}
+                {window.localStorage.getItem('CLINIC_CITY') ?? 'KUNJAH'}
               </b>
             </p>
-            <p STYLE="font-size: 10px; margin: 0; margin-bottom: 48px;">
+            <p STYLE="font-size: 12px; margin: 0; margin-bottom: 48px;">
               cell number ---{' '}
               <b STYLE="font-size: 12px; margin: 0;">
-                {window.localStorage.getItem('CLINIC_CONTACT') ?? ''}
+                {window.localStorage.getItem('CLINIC_CONTACT') ??
+                  '0349 4695920'}
               </b>
             </p>
           </div>
@@ -147,25 +151,25 @@ const HtmlToPdf = (props) => {
             <tbody>
               <tr STYLE="min-height:  24px; display:  flex; font-size:  12px;">
                 <td STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;">
-                  <p STYLE="font-size: 10px; margin: 0; min-width: 128px;">
+                  <p STYLE="font-size: 12px; margin: 0; min-width: 128px;">
                     REPORT <span>#</span>
                   </p>
-                  <p STYLE="font-size: 10px; margin: 0;">
+                  <p STYLE="font-size: 12px; margin: 0;">
                     {data?.report?.report_id}
                   </p>
                 </td>
                 <td STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;">
-                  <p STYLE="font-size: 10px; margin: 0; min-width:  160px;">
+                  <p STYLE="font-size: 12px; margin: 0; min-width:  200px;">
                     REGISTRATION DATE
                   </p>
-                  <p STYLE="font-size: 10px; margin: 0;">
+                  <p STYLE="font-size: 12px; margin: 0;">
                     {new Date(data?.report?.registration_date).toDateString()}
                   </p>
                 </td>
               </tr>
               <tr STYLE="min-height:  24px; display:  flex; font-size:  12px;">
                 <td STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;">
-                  <p STYLE="font-size: 10px; margin: 0; min-width: 128px;">
+                  <p STYLE="font-size: 12px; margin: 0; min-width: 128px;">
                     PATIENT NAME
                   </p>
                   <b STYLE="font-size: 12px; margin: 0;">
@@ -173,17 +177,17 @@ const HtmlToPdf = (props) => {
                   </b>
                 </td>
                 <td STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;">
-                  <p STYLE="font-size: 10px; margin: 0; min-width: 160px;">
+                  <p STYLE="font-size: 12px; margin: 0; min-width: 200px;">
                     REPORT COLLECTION DATE
                   </p>
-                  <p STYLE="font-size: 10px; margin: 0;">
+                  <p STYLE="font-size: 12px; margin: 0;">
                     {new Date(data?.report?.collection_date).toDateString()}
                   </p>
                 </td>
               </tr>
               <tr STYLE="min-height:  24px; display:  flex; font-size:  12px;">
                 <td STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;">
-                  <p STYLE="font-size: 10px; margin: 0; min-width: 128px;">
+                  <p STYLE="font-size: 12px; margin: 0; min-width: 128px;">
                     FATHER / HUSBAND
                   </p>
                   <b STYLE="font-size: 12px; margin: 0;">
@@ -191,10 +195,10 @@ const HtmlToPdf = (props) => {
                   </b>
                 </td>
                 <td STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;">
-                  <p STYLE="font-size: 10px; margin: 0; min-width: 160px;">
+                  <p STYLE="font-size: 12px; margin: 0; min-width: 200px;">
                     REGISTERATION LOCATION
                   </p>
-                  <p STYLE="font-size: 10px; margin: 0;">
+                  <p STYLE="font-size: 12px; margin: 0;">
                     {window.localStorage.getItem('REGISTRATION_LOCATION') ?? ''}
                   </p>
                 </td>
@@ -204,7 +208,7 @@ const HtmlToPdf = (props) => {
                   colSpan="2"
                   STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;"
                 >
-                  <p STYLE="font-size: 10px; margin: 0; min-width: 8rem;">
+                  <p STYLE="font-size: 12px; margin: 0; min-width: 8rem;">
                     AGE / SEX
                   </p>
                   <b STYLE="font-size: 12px; margin: 0;">
@@ -257,7 +261,8 @@ const HtmlToPdf = (props) => {
                         {test?.test_name}
                       </td>
                       <td STYLE="padding-top:  1rem; display:  flex; align-items:  center; justify-content:  center; font-weight:  bold; flex:  1;">
-                        {test?.result} {test?.test_unit}
+                        {test?.result}
+                        {/* {test?.test_unit} */}
                       </td>
                       <td STYLE="padding-top:  1rem; display:  flex; align-items:  center; justify-content:  center; flex:  1;">
                         {test?.normal_value ? test?.normal_value : '-'}

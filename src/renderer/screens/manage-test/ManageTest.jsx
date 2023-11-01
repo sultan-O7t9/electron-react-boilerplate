@@ -97,11 +97,11 @@ const ManageTestPage = () => {
       dataIndex: 'type_name',
       key: 'type_name',
     },
-    {
-      title: 'Test Unit',
-      dataIndex: 'test_unit',
-      key: 'test_unit',
-    },
+    // {
+    //   title: 'Test Unit',
+    //   dataIndex: 'test_unit',
+    //   key: 'test_unit',
+    // },
   ];
 
   useEffect(() => {
@@ -144,14 +144,14 @@ const ManageTestPage = () => {
                 value={testNormalValue}
                 onChange={handleNormalValueChange}
               />
-              <Input
+              {/* <Input
                 label={'Test Unit'}
                 // error={errors.name}
                 size="large"
                 placeholder="Enter Test Unit"
                 value={testUnit}
                 onChange={handleUnitChange}
-              />
+              /> */}
               <div style={{ flex: 1 }}>
                 <p className="input-label">Test Type</p>
                 <Select

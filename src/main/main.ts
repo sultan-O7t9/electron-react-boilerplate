@@ -15,6 +15,7 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 const sqlite3 = require('sqlite3');
+const firstRun = require('electron-first-run');
 
 class AppUpdater {
   constructor() {
@@ -228,6 +229,12 @@ app
         PRIMARY KEY (report_id, test_id)
       );`);
     });
+
+    const isFirstRun = firstRun();
+
+    if (isFirstRun) {
+      // Then insert all basic data
+    }
 
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
