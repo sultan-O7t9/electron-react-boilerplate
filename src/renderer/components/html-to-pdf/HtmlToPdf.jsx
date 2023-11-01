@@ -195,7 +195,7 @@ const HtmlToPdf = (props) => {
                   </b>
                 </td>
                 <td STYLE="flex:  1; min-width:  50%; display:  flex; align-items:  center; margin-right:  1rem;">
-                  <p STYLE="font-size: 12px; margin: 0; min-width: 200px;">
+                  <p STYLE="font-size: 12px; margin: 0; min-width: 180px;">
                     REGISTERATION LOCATION
                   </p>
                   <p STYLE="font-size: 12px; margin: 0;">
@@ -248,9 +248,11 @@ const HtmlToPdf = (props) => {
                     <td STYLE="padding:  0.15rem; display:  flex; align-items:  center; justify-content:  center; font-weight:  bold; flex:  1;">
                       RESULT
                     </td>
-                    <td STYLE="padding:  0.15rem; display:  flex; align-items:  center; justify-content:  center; font-weight:  bold; flex:  1;">
-                      NORMAL VALUE
-                    </td>
+                    {item?.data?.every((item) => item.normal_value) ? (
+                      <td STYLE="padding:  0.15rem; display:  flex; align-items:  center; justify-content:  center; font-weight:  bold; flex:  1;">
+                        NORMAL VALUE
+                      </td>
+                    ) : null}
                   </tr>
                   {item?.data?.map((test) => (
                     <tr
@@ -262,11 +264,12 @@ const HtmlToPdf = (props) => {
                       </td>
                       <td STYLE="padding-top:  1rem; display:  flex; align-items:  center; justify-content:  center; font-weight:  bold; flex:  1;">
                         {test?.result}
-                        {/* {test?.test_unit} */}
                       </td>
-                      <td STYLE="padding-top:  1rem; display:  flex; align-items:  center; justify-content:  center; flex:  1;">
-                        {test?.normal_value ? test?.normal_value : '-'}
-                      </td>
+                      {test?.normal_value ? (
+                        <td STYLE="padding-top:  1rem; display:  flex; align-items:  center; justify-content:  center; flex:  1;">
+                          {test?.normal_value}
+                        </td>
+                      ) : null}
                     </tr>
                   ))}
                 </tbody>

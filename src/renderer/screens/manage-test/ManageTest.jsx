@@ -63,9 +63,7 @@ const ManageTestPage = () => {
     console.log(testType, testName, testNormalValue, testUnit);
 
     const query = `INSERT INTO test (type_id,test_name,normal_value,test_unit) VALUES
-       (${testType},'${testName.toUpperCase()}','${
-         testNormalValue ? testNormalValue : '-'
-       }','${testUnit}');`;
+       (${testType},'${testName.toUpperCase()}','${testNormalValue}','${testUnit}');`;
     await addTest(query, () => (
       <p>Test: {testName.toUpperCase()} added successfully!</p>
     ));
