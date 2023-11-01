@@ -282,9 +282,7 @@ const AddReportPage = () => {
                             />
                             <p>{test?.test_unit}</p>
                           </div>
-                          <div className="test-col">
-                            {test.normal_value ? test.normal_value : '-'}
-                          </div>
+                          <div className="test-col">{test.normal_value}</div>
                         </div>
                       ))}
                     </div>

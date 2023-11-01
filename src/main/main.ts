@@ -232,9 +232,66 @@ app
 
     const isFirstRun = firstRun();
 
-    if (isFirstRun) {
-      // Then insert all basic data
-    }
+    // if (isFirstRun) {
+    // Then insert all basic data
+    db.all(
+      "SELECT * FROM test_type WHERE type_id=1 AND type_NAME='LIPID PROFILE';",
+      (_: any, data: any) => {
+        console.log('QUERY_MAIN', data.length);
+        if (data?.length > 0) return;
+        db.serialize(() => {
+          db.run(`
+            INSERT INTO test_type (type_id,type_name)
+            VALUES
+              (1, 'LIPID PROFILE'),
+              (2, 'H-PYLORI'),
+              (3, 'LIVER FUNCTION TEST'),
+              (4, 'RENAL FUNCTION TEST'),
+              (5, 'SEROLOGY'),
+              (6, 'M.P'),
+              (7, 'H.B'),
+              (8, 'CA'),
+              (9, 'TYPHOID'),
+              (10, 'HEPATITIS');
+            `);
+          db.run(`
+            INSERT INTO test (test_id, test_name, normal_value, test_unit, type_id)
+            VALUES
+              (1,'CHOLESTORL','150 - 200mg%','',1),
+              (2,'TRIGLYCRIDE','Upto 150 mg%','',1),
+              (3,'HDL','More than 40mg%','',1),
+              (4,'LDL','Upto 150 mg%','',1),
+
+              (5,'HPL','','',2),
+
+              (6,'S.GPT (ALT)','F=31mg% M=40mg%','',3),
+              (7,'S.GOT (ALT)','F=31mg% M=40mg%','',3),
+              (8,'S BILLIRUBIN','0.5 - 1.0mg%','',3),
+              (9,'ALK.PHOS','98 - 179mg%','',3),
+
+              (10,'URIC ACID','M:3.0 - 7.0   F:2.5 - 5.0','',4),
+              (11,'BLOOD UREA','10 - 50mg%','',4),
+              (12,'S.CREATENINE','0.5 - 1.3mg%','',4),
+
+              (13,'BLOOD SUGAR','70 - 120 mg/dl','',5),
+              (14,'BLOOD GROUP','','',5),
+              
+              (15,'M.P','','',6),
+              
+              (16,'H.B','12 to 15','',7),
+              
+              (17,'CA','M:8.5 to 10.5   F:8.6 to 10.7','',8),
+
+              (18,'IGG','','',9),
+              (19,'IGM','','',9),
+              
+              (20,'ANTI HCV','','',10),
+              (21,'HEP B','','',10);
+            `);
+        });
+      },
+    );
+    // }
 
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
