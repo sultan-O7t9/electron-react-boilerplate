@@ -224,7 +224,6 @@ const HtmlToPdf = (props) => {
               <table
                 key={item?.type_id}
                 id={'tbl-' + item}
-                key={item}
                 className="table"
                 STYLE="width:  100%; border-collapse:  collapse; margin:  0;"
               >
